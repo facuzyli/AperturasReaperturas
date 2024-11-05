@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const aperturasRoutes = require('./routes/aperturas');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const tareasRoutes = require('./routes/tareas');
 
 app.use('/auth', authRoutes);
 app.use('/api/aperturas', aperturasRoutes);
@@ -27,9 +28,11 @@ mongoose.connect('mongodb://mongo:27017/aperturasdb', {
 .catch((err) => console.error(err));
 
 
+
 // Middlewares
 app.use(bodyParser.json());
 app.use(cors());
+app.use('/api/tareas', tareasRoutes);
 
 // Importar rutas
 const apiRoutes = require('./routes/api');

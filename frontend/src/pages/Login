@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function Login({ history }) {
+  // Estados para los campos del formulario
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Enviar datos al backend
       const res = await axios.post('/auth/login', { email, password });
+      // Guardar token en localStorage
       localStorage.setItem('token', res.data.token);
+      // Redirigir al dashboard
       history.push('/dashboard');
     } catch (err) {
       console.error(err.response.data.msg);
@@ -20,8 +25,20 @@ function Login({ history }) {
     <div>
       <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit}>
-        <input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <input
+          type="email"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
         <button type="submit">Ingresar</button>
       </form>
     </div>

@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const preguntasRoutes = require('./routes/preguntas');
 
-// Definir rutas aquí
+
+app.use('/api/preguntas', preguntasRoutes);
+
 router.get('/', (req, res) => {
   res.send('API funcionando');
 });

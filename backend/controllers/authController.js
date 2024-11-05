@@ -1,8 +1,7 @@
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Registro de usuarios
+// Controlador para registrar un nuevo usuario
 exports.registerUser = async (req, res) => {
   try {
     const { nombre, email, password, rol, area } = req.body;
@@ -14,33 +13,33 @@ exports.registerUser = async (req, res) => {
     // Crear nuevo usuario
     user = new User({ nombre, email, password, rol, area });
 
-    // Encriptar contraseña
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    // Guardar usuario
+    // Guardar usuario en la base de datos
     await user.save();
 
-    res.status(201).json({ msg: 'Usuario registrado exitosamente' });
+    // Crear y enviar token de autenticación
+    const payload = { userId: user._id, rol: user.rol };
+    const token = jwt.sign(payload, 'secretKey', { expiresIn: '1h' });
+
+    res.status(201).json({ token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Inicio de sesión
+// Controlador para iniciar sesión
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Verificar si el usuario existe
+    // Buscar usuario por email
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ msg: 'Credenciales inválidas' });
 
-    // Verificar contraseña
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Comparar contraseña
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(400).json({ msg: 'Credenciales inválidas' });
 
-    // Crear token
+    // Crear y enviar token de autenticación
     const payload = { userId: user._id, rol: user.rol };
     const token = jwt.sign(payload, 'secretKey', { expiresIn: '1h' });
 
